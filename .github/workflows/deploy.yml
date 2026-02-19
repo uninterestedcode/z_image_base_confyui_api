@@ -1,0 +1,69 @@
+name: Deploy to RunPod
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+env:
+  RUNPOD_API_KEY: ${{ secrets.RUNPOD_API_KEY }}
+  DOCKER_REGISTRY: docker.io
+  IMAGE_NAME: ${{ github.repository }}
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+      
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.DOCKER_REGISTRY }}
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+      
+      - name: Extract metadata
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.DOCKER_REGISTRY }}/${{ env.IMAGE_NAME }}
+          tags: |
+            type=ref,event=branch
+            type=sha,prefix={{branch}}-
+            type=raw,value=latest,enable={{is_default_branch}}
+      
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+      
+      - name: Deploy to RunPod
+        run: |
+          echo "Docker image pushed successfully"
+          echo "Image tags: ${{ steps.meta.outputs.tags }}"
+          echo "To deploy to RunPod, use the following image:"
+          echo "${{ env.DOCKER_REGISTRY }}/${{ env.IMAGE_NAME }}:latest"
+          echo ""
+          echo "Manual deployment steps:"
+          echo "1. Go to RunPod Console → Serverless → New Endpoint"
+          echo "2. Select 'Custom Container'"
+          echo "3. Enter image: ${{ env.DOCKER_REGISTRY }}/${{ env.IMAGE_NAME }}:latest"
+          echo "4. Configure settings:"
+          echo "   - Container Port: 8000"
+          echo "   - Min Replicas: 0"
+          echo "   - Max Replicas: 5"
+          echo "   - Timeout: 300"
+          echo "   - Idle Timeout: 60"
+          echo "5. Click Deploy"

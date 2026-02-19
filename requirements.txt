@@ -1,0 +1,16 @@
+# RunPod Serverless SDK
+runpod>=1.6.0
+
+# ComfyUI dependencies (included in base image, but listed for reference)
+# These are pre-installed in runpod/worker-comfyui:5.5.1-base
+
+# Additional utilities
+Pillow>=10.0.0
+numpy>=1.24.0
+pydantic>=2.0.0
+
+# Logging and monitoring
+python-json-logger>=2.0.0
+
+# Async HTTP client
+aiohttp>=3.9.0
