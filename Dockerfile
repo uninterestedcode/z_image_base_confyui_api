@@ -37,4 +37,4 @@ HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
     CMD python -c "import requests; requests.get('http://127.0.0.1:8188/system_stats')" || exit 1
 
 # Start ComfyUI in background and run handler
-CMD ["sh", "-c", "comfyui start --listen 0.0.0.0 --port 8188 & sleep 10 && python handler.py --rp_serve_api --rp_api_port 8000"]
+CMD ["sh", "-c", "echo 'Starting ComfyUI...' && comfyui start --listen 0.0.0.0 --port 8188 > /tmp/comfyui.log 2>&1 & COMFYUI_PID=$! && echo 'Waiting for ComfyUI to be ready...' && for i in $(seq 1 60); do if curl -s http://127.0.0.1:8188/system_stats > /dev/null 2>&1; then echo 'ComfyUI is ready!'; break; fi; echo 'Waiting for ComfyUI... ($i/60)'; sleep 1; done && if ! curl -s http://127.0.0.1:8188/system_stats > /dev/null 2>&1; then echo 'ERROR: ComfyUI failed to start'; cat /tmp/comfyui.log; exit 1; fi && echo 'Starting RunPod serverless handler...' && python handler.py"]
