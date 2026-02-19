@@ -45,7 +45,8 @@
       },
       "10": {
         "inputs": {
-          "filename": "z_image_bf16.safetensors"
+          "unet_name": "z_image_bf16.safetensors",
+          "weight_dtype": "default"
         },
         "class_type": "UNETLoader",
         "_meta": {
@@ -54,7 +55,8 @@
       },
       "11": {
         "inputs": {
-          "filename": "qwen_3_4b.safetensors"
+          "clip_name": "qwen_3_4b.safetensors",
+          "type": "qwen_image"
         },
         "class_type": "CLIPLoader",
         "_meta": {
@@ -63,7 +65,7 @@
       },
       "12": {
         "inputs": {
-          "filename": "ae.safetensors"
+          "vae_name": "pixel_space"
         },
         "class_type": "VAELoader",
         "_meta": {
@@ -72,7 +74,7 @@
       },
       "13": {
         "inputs": {
-          "value": 3.1,
+          "shift": 3.1,
           "model": [
             "10",
             0
