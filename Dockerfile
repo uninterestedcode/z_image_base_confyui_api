@@ -65,16 +65,9 @@ RUN if [ "$ENABLE_PYTORCH_UPGRADE" = "true" ]; then \
 WORKDIR /comfyui
 
 # Install custom nodes needed for z-image workflow
-# Note: ComfyUI-Manager is already installed by comfy-cli, so we skip it if it exists
-RUN if [ ! -d "custom_nodes/ComfyUI-Manager" ]; then \
-      git clone https://github.com/ltdrdata/ComfyUI-Manager.git custom_nodes/ComfyUI-Manager; \
-    fi && \
-    if [ ! -d "custom_nodes/ComfyUI-KJNodes" ]; then \
-      git clone https://github.com/kijai/ComfyUI-KJNodes custom_nodes/ComfyUI-KJNodes; \
-    fi && \
-    if [ ! -d "custom_nodes/Civicomfy" ]; then \
-      git clone https://github.com/MoonGoblinDev/Civicomfy custom_nodes/Civicomfy; \
-    fi
+# Note: ComfyUI-Manager is already installed by comfy-cli, so we skip it
+RUN git clone https://github.com/kijai/ComfyUI-KJNodes custom_nodes/ComfyUI-KJNodes || true && \
+    git clone https://github.com/MoonGoblinDev/Civicomfy custom_nodes/Civicomfy || true
 
 # Install custom node dependencies
 RUN for node_dir in custom_nodes/*/; do \
